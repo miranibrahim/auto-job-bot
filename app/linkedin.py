@@ -12,21 +12,16 @@ KEYWORDS = (
 )
 
 def build_url(country, remote_only=False):
-    query = KEYWORDS
+    base_keywords = KEYWORDS
 
-    if not remote_only:
-        query += ' AND ("visa sponsorship" OR relocation)'
+    keywords = f'{base_keywords} AND ("visa sponsorship" OR relocation)' if not remote_only else base_keywords
 
-    params = {
-        "keywords": query,
-        "location": country,
-        "f_TPR": "r86400",
-        "sortBy": "DD",
-        "f_WT": "2" if remote_only else "1,2"
-    }
+    url = f"{BASE_URL}?f_TPR=r86400&keywords={quote(keywords)}&location={quote(country)}"
 
-    query_string = "&".join(f"{k}={quote(str(v))}" for k, v in params.items())
-    return f"{BASE_URL}?{query_string}"
+    if remote_only:
+        url += "&f_WT=2"
+
+    return url
 
 def fetch_jobs(url, logger):
     headers = {
